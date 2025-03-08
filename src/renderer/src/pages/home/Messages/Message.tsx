@@ -8,7 +8,7 @@ import { getModelUniqId } from '@renderer/services/ModelService'
 import { estimateMessageUsage } from '@renderer/services/TokenService'
 import { useAppDispatch } from '@renderer/store'
 import { updateMessages } from '@renderer/store/messages'
-import { Assistant, Message, Topic } from '@renderer/types'
+import { Assistant, Message, Topic, Model } from '@renderer/types'
 import { classNames, runAsyncFunction } from '@renderer/utils'
 import { Divider, Dropdown } from 'antd'
 import { Dispatch, FC, memo, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -25,6 +25,7 @@ interface Props {
   message: Message
   topic: Topic
   assistant?: Assistant
+  model?: Model
   index?: number
   total?: number
   hidePresetMessages?: boolean
@@ -34,6 +35,7 @@ interface Props {
   onGetMessages?: () => Message[]
   onSetMessages?: Dispatch<SetStateAction<Message[]>>
   onDeleteMessage?: (message: Message) => Promise<void>
+  model?: Model
 }
 
 const MessageItem: FC<Props> = ({
@@ -162,7 +164,14 @@ const MessageItem: FC<Props> = ({
           </Dropdown>
         </ContextMenuOverlay>
       )}
-      <MessageHeader message={message} assistant={assistant} model={model} key={getModelUniqId(model)} />
+      {model && (
+        <MessageHeader
+          message={message}
+          assistant={assistant}
+          model={model!} 
+          key={model ? getModelUniqId(model) : 'no-model'}
+        />
+      )}
       <MessageContentContainer
         className="message-content-container"
         style={{ fontFamily, fontSize, background: messageBackground }}>

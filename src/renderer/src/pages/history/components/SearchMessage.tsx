@@ -12,6 +12,7 @@ import styled from 'styled-components'
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   message?: Message
+  topic?: string
 }
 
 const SearchMessage: FC<Props> = ({ message, ...props }) => {
@@ -26,7 +27,7 @@ const SearchMessage: FC<Props> = ({ message, ...props }) => {
   return (
     <MessagesContainer {...props} className={messageStyle}>
       <ContainerWrapper style={{ paddingTop: 20, paddingBottom: 20, position: 'relative' }}>
-        <MessageItem message={message} />
+        <MessageItem message={message} topic={{ id: message.topicId } as Topic} />
         <Button
           type="text"
           size="middle"
