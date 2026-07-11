@@ -119,12 +119,30 @@ jobs:
           RENDERER_VITE_AIHUBMIX_SECRET: ${{ secrets.RENDERER_VITE_AIHUBMIX_SECRET }}
           RENDERER_VITE_PPIO_APP_SECRET: ${{ secrets.RENDERER_VITE_PPIO_APP_SECRET }}
 
+      - name: Check Apple signing secrets
+        id: apple-signing
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          if [ -n "$CSC_LINK" ] && [ -n "$CSC_KEY_PASSWORD" ]; then
+            echo "sign=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "sign=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+
       - name: Build Mac
         if: matrix.os == 'macos-latest'
         run: |
           sudo -H pip install setuptools
+          if [ "$APPLE_SIGN" != "true" ]; then
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+          fi
           pnpm build:mac
         env:
+          APPLE_SIGN: ${{ steps.apple-signing.outputs.sign }}
           CSC_FOR_PULL_REQUEST: true
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
